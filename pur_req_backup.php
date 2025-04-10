@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user'])){
+if (!isset($_SESSION['admin'])){
   header('location:login.php');
 }
 
@@ -13,22 +13,6 @@ try{
     } catch (PDOException $e) {
     echo 'Connection Failed' .$e->getMessage();
     }
-
-if(isset($_GET['filter']))
-  {
-    $_SESSION['min'] = $_GET['min'];
-    $_SESSION['max'] = $_GET['max'];
-    $_SESSION['sta'] = $_GET['sta'];
-  }
-  
-if (isset($_GET['reset'])) 
-  {
-    unset($_SESSION['min']);
-    unset($_SESSION['max']);
-    unset($_SESSION['sta']);
-    header("Location: pur_req_user.php");
-    exit;
-  }
 
 if(isset($_POST['create']))
   {
@@ -66,7 +50,7 @@ if(isset($_POST['create']))
     $remarks = $_POST['remarks'];
     $date = date('Y-m-d');
     $purpose = $_POST['purpose'];
-    $last_ud = $_SESSION['user'];
+    $last_ud = $_SESSION['admin'];
     $stmt = $pdo->prepare("INSERT into pur_req(pr_id, pr_no, province, date, purpose, status, remarks, documents, last_ud)
     values ('$pr_id', '$pr_no', '$province', '$date', '$purpose', 'Pending', '$remarks', :filename, '$last_ud')");
     $stmt->bindParam(':filename', $newfilename);
@@ -86,7 +70,7 @@ if(isset($_POST['update']))
     $purpose = $_POST['purpose'];
     $status = $_POST['status'];
     $remarks = $_POST['remarks'];
-    $last_ud = $_SESSION['user'];
+    $last_ud = $_SESSION['admin'];
 
     $stmt = $pdo->prepare("UPDATE pur_req set status='$status', remarks='$remarks', date='$date', purpose='$purpose', province='$province', last_ud='$last_ud' where pr_no='$pr_no'");
     if($stmt->execute()){
@@ -105,7 +89,7 @@ if(isset($_POST['upload']))
     $temp = explode(".", $_FILES["choosefile"]["name"]);
     $newfilename = $pr_no.'.'.end($temp);
     $folder = "documents/".$newfilename;
-    $last_ud = $_SESSION['user'];
+    $last_ud = $_SESSION['admin'];
 
     $stmt = $pdo->prepare("UPDATE pur_req SET documents=:filename, last_ud='$last_ud' where pr_no=:pr_no");
     $stmt->bindParam(':pr_no', $pr_no);
@@ -144,14 +128,13 @@ if(!empty($_GET['file']))
 if(isset($_POST['delete']))
   {
     $pr_no = $_POST['pr_no2'];
-    $last_ud = $_SESSION['user'];
 
-    $stmt = $pdo->prepare("UPDATE pur_req SET status='RD', last_ud='$last_ud' where pr_no='$pr_no'");
+    $stmt = $pdo->prepare("DELETE from pur_req where pr_no='$pr_no'");
     if($stmt->execute()){
-      $_SESSION['success'] = $pr_no. " Delete Request Submitted Successfully!";
+      $_SESSION['success'] = $pr_no. " Deleted Successfully!";
     }
     else{
-      $_SESSION['error'] = $pr_no. " Delete Request Submission Failed!";
+      $_SESSION['error'] = $pr_no. " Delete Failed!";
     }
   }
 ?>
@@ -184,12 +167,13 @@ if(isset($_POST['delete']))
               <a class="nav-link" href="index.php" style="color: white;"><i class="bi bi-pie-chart me-2"></i>Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="pur_req_user.php" style="color: white;"><i class="bi bi-card-checklist"></i> Purchase Request</a>
+              <a class="nav-link active" href="pur_req.php" style="color: white;"><i class="bi bi-card-checklist"></i> Purchase Request</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;"><i class="bi bi-person-circle"></i> Profile</a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item disabled" href="#"><?php echo $_SESSION['user']; ?> (user)</a></li>
+                  <li><a class="dropdown-item disabled" href="#"><?php echo $_SESSION['admin']; ?> (admin)</a></li>
+                  <li><a class="dropdown-item" href="settings.php">Settings</a></li>
                   <li><a class="dropdown-item" href="logout.php" style="color: red">Logout</a></li>
                 </ul>
             </li>
@@ -208,7 +192,7 @@ if(isset($_POST['delete']))
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <form action="pur_req_user.php" method="POST" enctype="multipart/form-data">
+      <form action="pur_req.php" method="POST" enctype="multipart/form-data">
       <div class="modal-body">
 
 
@@ -263,7 +247,7 @@ if(isset($_POST['delete']))
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <form action="pur_req_user.php" method="POST">
+      <form action="pur_req.php" method="POST">
       <div class="modal-body">
 
         <div class="input-group mb-3">
@@ -331,7 +315,7 @@ if(isset($_POST['delete']))
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <form action="pur_req_user.php" method="POST" enctype="multipart/form-data">
+      <form action="pur_req.php" method="POST" enctype="multipart/form-data">
       <div class="modal-body">
 
       <input type="hidden" name="pr_no3" id="pr_no3">
@@ -358,11 +342,11 @@ if(isset($_POST['delete']))
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="deletemodalLabel">Submit Delete Request</h1>
+        <h1 class="modal-title fs-5" id="deletemodalLabel">Confirm Delete</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <form action="pur_req_user.php" method="POST">
+      <form action="pur_req.php" method="POST">
       <div class="modal-body">
 
         <div class="input-group mb-3">
@@ -374,7 +358,7 @@ if(isset($_POST['delete']))
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" name="delete" class="btn btn-danger">Request Delete</button>
+        <button type="submit" name="delete" class="btn btn-danger">Delete</button>
       </div>
       
       </form>
@@ -390,55 +374,29 @@ if(isset($_POST['delete']))
 <h3>PURCHASE REQUEST</h3>
 </div>
 <div class="col text-end">
+<button type='button' id='delreq' onclick="window.location.href='delreq.php';" class='btn btn-outline-danger'>Deletion Request</button>
 <button type='button' id='exportBtn' class='btn btn-outline-warning'>Export</button>
 <button type='button' id='create' class='btn btn-outline-success createbtn'>Create New +</button>
 </div>
 </div>
 <hr>
 
-<form action="pur_req_user.php" method="GET">
 <div class="container text-center">
   <div class="row align-items-center">
     <div class="col">
     <div class="form-group mb-3">
       <label for="">From</label>
-      <input type="date" name="min" id="min" class="form-control" value="<?= isset($_SESSION['min']) ? $_SESSION['min'] : '' ?>" required>
+      <input type="text" name="min" id="min"  class="form-control">
     </div>
     </div>
     <div class="col">
     <div class="form-group mb-3">
       <label for="">To</label>
-      <input type="date" name="max" id="max" class="form-control" value="<?= isset($_SESSION['max']) ? $_SESSION['max'] : '' ?>" required>
-    </div>
-    </div>
-    <div class="col">
-    <div class="form-group mb-3">
-      <label for="">Status</label>
-      <select name="sta" id="sta" class="form-select" required>
-        <option value=""></option>
-        <option value="All" <?= (isset($_SESSION['sta']) && $_SESSION['sta'] == 'All') ? 'selected' : '' ?>>All</option>
-        <option value="Done" <?= (isset($_SESSION['sta']) && $_SESSION['sta'] == 'Done') ? 'selected' : '' ?>>Done</option>
-        <option value="On-going" <?= (isset($_SESSION['sta']) && $_SESSION['sta'] == 'On-going') ? 'selected' : '' ?>>On-going</option>
-        <option value="Pending" <?= (isset($_SESSION['sta']) && $_SESSION['sta'] == 'Pending') ? 'selected' : '' ?>>Pending</option>
-      </select>
-    </div>
-    </div>
-    <div class="col">
-    <div class="form-group mb-3">
-    <label>Filter</label>
-    <div class="row g-2">
-      <div class="col-6">
-        <button type="submit" class="btn btn-outline-success w-100" name="filter">Apply</button>
-      </div>
-      <div class="col-6">
-        <button type="submit" class="btn btn-outline-danger w-100" name="reset">Reset</button>
-      </div>
-    </div>
+      <input type="text" name="max" id="max"  class="form-control">
     </div>
     </div>
   </div>
 </div>
-</form>
 <hr>
 
 <!-- TABLE -->
@@ -465,11 +423,7 @@ if(isset($_POST['delete']))
         $done_count = 0;
         $ong_count = 0;
         $pend_count = 0;
-        if(isset($_SESSION['min']) && isset($_SESSION['max']) && isset($_SESSION['sta']) && $_SESSION['sta'] != 'All'){
-        $min = $_SESSION['min'];
-        $max = $_SESSION['max'];
-        $sta = $_SESSION['sta'];
-        $stmt = $pdo->prepare("SELECT * from pur_req WHERE status != 'RD' and '$min' <= date and date <= '$max' and status = '$sta'");
+        $stmt = $pdo->prepare("SELECT * from pur_req WHERE status != 'RD'");
         $stmt->execute();
         if($stmt->rowCount() > 0){
             $result = $stmt->fetchAll();
@@ -499,7 +453,7 @@ if(isset($_POST['delete']))
                     <td scope="col" class="text-center"><?= $row['purpose']; ?></td>
                     <?php echo $status ?>
                     <td scope="col" class="text-center"><?= $row['remarks']; ?></td>
-                    <td scope="col" class="text-center"><a href="pur_req_user.php?file=<?php echo $row['documents']; ?>"><?php echo $row['documents']; ?></a></td>
+                    <td scope="col" class="text-center"><a href="pur_req.php?file=<?php echo $row['documents']; ?>"><?php echo $row['documents']; ?></a></td>
                     <td scope="col" class="text-center"><?= $row['last_ud']; ?></td>
                     <td scope="col" class="text-center">
                         <div class='btn-group' role='group' aria-label='Basic mixed styles example'>
@@ -512,99 +466,6 @@ if(isset($_POST['delete']))
         <?php
                   }
                 }
-              }
-              elseif(isset($_SESSION['min']) && isset($_SESSION['max']) && isset($_SESSION['sta']) && $_SESSION['sta'] == 'All'){
-                $min = $_SESSION['min'];
-                $max = $_SESSION['max'];
-                $stmt = $pdo->prepare("SELECT * from pur_req WHERE status != 'RD' and '$min' <= date and date <= '$max'");
-                $stmt->execute();
-                if($stmt->rowCount() > 0){
-                    $result = $stmt->fetchAll();
-                    foreach($result as $row){
-                        $status = '';
-                        if ($row['status'] == 'Done'){
-                            $status .= "<td scope='col' style='color: white;' class='text-center bg-success'>Done</td>";
-                            $done_count += 1;
-                        }
-                        else if ($row['status'] == 'On-going'){
-                            $status .= "<td scope='col' style='color: white;' class='text-center bg-warning'>On-going</td>";
-                            $ong_count += 1;
-                        }
-                        else if ($row['status'] == 'Pending'){
-                          $status .= "<td scope='col' style='color: white;' class='text-center bg-secondary'>Pending</td>";
-                          $pend_count += 1;
-                        }
-                        else {
-                          continue;
-                        }
-                        $count += 1;
-                  ?>
-                         <tr>
-                              <td scope="col" class="text-center"><?= $row['pr_no']; ?></td>
-                              <td scope="col" class="text-center"><?= $row['province']; ?></td>
-                              <td scope="col" class="text-center"><?= $row['date']; ?></td>
-                              <td scope="col" class="text-center"><?= $row['purpose']; ?></td>
-                              <?php echo $status ?>
-                              <td scope="col" class="text-center"><?= $row['remarks']; ?></td>
-                              <td scope="col" class="text-center"><a href="pur_req_user.php?file=<?php echo $row['documents']; ?>"><?php echo $row['documents']; ?></a></td>
-                              <td scope="col" class="text-center"><?= $row['last_ud']; ?></td>
-                              <td scope="col" class="text-center">
-                                  <div class='btn-group' role='group' aria-label='Basic mixed styles example'>
-                                      <button type='button' id='<?php echo $row['id']; ?>' class='btn btn-outline-secondary editbtn' value='<?php echo $row['id']; ?>'><i class="bi bi-pencil-square"></i></button>
-                                      <button type='button' id='<?php echo $row['id']; ?>' class='btn btn-outline-warning uploadbtn' value='<?php echo $row['id']; ?>'><i class="bi bi-file-earmark-arrow-up"></i></button>
-                                      <button type='button' id='<?php echo $row['id']; ?>' class='btn btn-outline-danger deletebtn' value='<?php echo $row['id']; ?>'><i class="bi bi-trash3"></i></button>
-                                  </div>
-                              </td>
-                         </tr> 
-                  <?php
-                            }
-                          }
-                }
-                else{
-                $stmt = $pdo->prepare("SELECT * from pur_req WHERE status != 'RD'");
-                $stmt->execute();
-                if($stmt->rowCount() > 0){
-                    $result = $stmt->fetchAll();
-                    foreach($result as $row){
-                        $status = '';
-                        if ($row['status'] == 'Done'){
-                            $status .= "<td scope='col' style='color: white;' class='text-center bg-success'>Done</td>";
-                            $done_count += 1;
-                        }
-                        else if ($row['status'] == 'On-going'){
-                            $status .= "<td scope='col' style='color: white;' class='text-center bg-warning'>On-going</td>";
-                            $ong_count += 1;
-                        }
-                        else if ($row['status'] == 'Pending'){
-                          $status .= "<td scope='col' style='color: white;' class='text-center bg-secondary'>Pending</td>";
-                          $pend_count += 1;
-                        }
-                        else {
-                          continue;
-                        }
-                    $count += 1;
-                ?>
-                       <tr>
-                            <td scope="col" class="text-center"><?= $row['pr_no']; ?></td>
-                            <td scope="col" class="text-center"><?= $row['province']; ?></td>
-                            <td scope="col" class="text-center"><?= $row['date']; ?></td>
-                            <td scope="col" class="text-center"><?= $row['purpose']; ?></td>
-                            <?php echo $status ?>
-                            <td scope="col" class="text-center"><?= $row['remarks']; ?></td>
-                            <td scope="col" class="text-center"><a href="pur_req_user.php?file=<?php echo $row['documents']; ?>"><?php echo $row['documents']; ?></a></td>
-                            <td scope="col" class="text-center"><?= $row['last_ud']; ?></td>
-                            <td scope="col" class="text-center">
-                                <div class='btn-group' role='group' aria-label='Basic mixed styles example'>
-                                    <button type='button' id='<?php echo $row['id']; ?>' class='btn btn-outline-secondary editbtn' value='<?php echo $row['id']; ?>'><i class="bi bi-pencil-square"></i></button>
-                                    <button type='button' id='<?php echo $row['id']; ?>' class='btn btn-outline-warning uploadbtn' value='<?php echo $row['id']; ?>'><i class="bi bi-file-earmark-arrow-up"></i></button>
-                                    <button type='button' id='<?php echo $row['id']; ?>' class='btn btn-outline-danger deletebtn' value='<?php echo $row['id']; ?>'><i class="bi bi-trash3"></i></button>
-                                </div>
-                            </td>
-                       </tr> 
-                <?php
-                          }
-                        }
-                      }
         ?>
     </tbody>
 </table>
@@ -707,6 +568,40 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     });
   </script>
 <?php unset($_SESSION['error']); } ?>
+
+<!-- DATE RANGE FILTER -->
+<script>
+let minDate, maxDate;
+ 
+ DataTable.ext.search.push(function (settings, data, dataIndex) {
+     let min = minDate.val();
+     let max = maxDate.val();
+     let date = new Date(data[2]);
+  
+     if (
+         (min === null && max === null) ||
+         (min === null && date <= max) ||
+         (min <= date && max === null) ||
+         (min <= date && date <= max)
+     ) {
+         return true;
+     }
+     return false;
+ });
+  
+ minDate = new DateTime('#min', {
+     format: 'MMMM Do YYYY'
+ });
+ maxDate = new DateTime('#max', {
+     format: 'MMMM Do YYYY'
+ });
+  
+ let table = new DataTable('#myTable');
+  
+ document.querySelectorAll('#min, #max').forEach((el) => {
+     el.addEventListener('change', () => table.draw());
+ });
+</script>
 
 <!-- MODAL -->
 <script>
