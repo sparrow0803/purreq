@@ -1,8 +1,8 @@
-# Project Documentation for purreq
+# Project Documentation for Purreq
 
 ## Project Overview
 
-**purreq** is a system created for an On-the-Job Training (OJT) project. It is designed to facilitate the management of purchase requests within an organization. The application is built using PHP and provides a user-friendly interface for users to submit and manage their purchase requests.
+**Purreq** is a system created for an On-the-Job Training (OJT) project. It is designed to facilitate the management of purchase requests within an organization. The application is built using PHP and provides a user-friendly interface for users to submit and manage their purchase requests.
 
 ## Tech Stack
 
@@ -44,5 +44,7 @@ To set up the project locally, follow these steps:
 ## Usage
 
 - **Login:** Use the credentials provided by your administrator to log in.
+- *Admin Account: username: admin | password: admin*
+- *User Account: username: user | password: user*
 - **Submit a Purchase Request:** Fill out the form and submit your request.
 - **Manage Requests:** View and manage your submitted requests from the dashboard.
