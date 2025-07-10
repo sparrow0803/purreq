@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 13, 2025 at 09:38 AM
+-- Generation Time: Jul 10, 2025 at 03:57 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,8 +45,9 @@ CREATE TABLE `pur_req` (
 --
 
 INSERT INTO `pur_req` (`id`, `pr_id`, `pr_no`, `province`, `date`, `purpose`, `status`, `remarks`, `documents`, `last_ud`) VALUES
-(77, '002', '2025-04-002', 'Aurora', '2025-04-10', 'Tools', 'Done', 'PCV', '2025-04-002.pdf', 'user'),
-(78, '003', '2025-04-003', 'Aurora', '2025-04-10', 'UTANG ', 'On-going', 'walang pera', '2025-04-003.pdf', 'admin');
+(80, '004', '2025-05-004', 'Aurora', '2025-05-27', 'dawd', 'Pending', 'dawdwa', '', 'admin'),
+(81, '005', '2025-06-005', 'Aurora', '2025-06-01', 'dwadwadd', 'Pending', 'dwadwa', '', 'admin'),
+(82, '006', '2025-07-006', 'Nueva Ecija', '2025-07-10', 'dwad', 'Pending', 'wadwa', '2025-07-006.pdf', 'admin');
 
 -- --------------------------------------------------------
 
@@ -93,7 +94,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `pur_req`
 --
 ALTER TABLE `pur_req`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT for table `user`
